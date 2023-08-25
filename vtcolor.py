@@ -2,11 +2,10 @@
 import os
 import signal
 import copy
-# pip3 install getch
-from getch import getch
+from kbhit import *
 
 def sig_handler(signum, frame):
-    pass
+    raise Exception("KeyboardInterrupt")
 
 class VtColor():
     CONFIG = '.vtcolor'
@@ -44,7 +43,7 @@ class VtColor():
                 f.write(f'{k}=#{val[0]:02x}{val[1]:02x}{val[2]:02x}\n')
 
     def loop(self):
-        # ctrl+Cでgetchが例外を出力するためSIGINTを無効化
+        # ctrl+Cで色を戻すためSIGINTを無効化
         signal.signal(signal.SIGINT, sig_handler)
         try:
             max_changepos = 3 * 3 - 1
@@ -135,6 +134,8 @@ class VtColor():
 
 
 def main():
+    atexit.register(set_normal_term)
+    set_curses_term()
     c = VtColor()
     if c.loop() == 0:
         c.write_settings()
